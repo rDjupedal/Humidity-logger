@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+</head>
+<body>
+    <div id="settings"></div>
+
+    <select id="selectLeft"></select>
+    <label for="selectLeft">Select Main sensor</label>
+    <br>
+    <select id="selectRight"></select>
+    <label for="selectRight">Select Rightpane sensor</label>
+    <br>
+    <input type="button" value="ok" id="okBtn">
+
+</body>
+
+<script>
+    // get list of sensors
+    let x = parent.sens.length;
+    let options='';
+    for (let i = 0; i < x; i++) {
+            options += '<option value=" ' + parent.sens[i].id + ' ">' + parent.sens[i].id + '</option>';
+        parent.sens[i].id
+    }
+    let selLeft = document.getElementById('selectLeft');
+    let selRight = document.getElementById('selectRight');
+
+    // Populate options with found sensors
+    selLeft.innerHTML = options;
+    selRight.innerHTML = options;
+
+    // Get stored sensors from settings and set them selected as default
+    let left = parent.settings.left();
+    let right = parent.settings.right();
+    selLeft.selectedIndex = parent.find(left);
+    selRight.selectedIndex = parent.find(right);
+
+    // On change of settings write it to cookie
+    selLeft.addEventListener('change', function() { parent.settings.setLeft(selLeft.value); }, false);
+    selRight.addEventListener('change', function() { parent.settings.setRight(selRight.value); }, false);
+
+    document.getElementById('okBtn').addEventListener('click', function() { parent.closeiframe(); }, false);
+
+
+</script>
+
+
+</html>

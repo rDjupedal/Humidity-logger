@@ -1,0 +1,248 @@
+<!-- Testing post function to order specific data from separate php file on server -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel = "stylesheet" type = "text/css" href = "style.css">
+    <title>tellstick test2_html_6</title>
+</head>
+<body>
+
+<div id="rh_display">
+    <input type="button" id="testBtn" value="test">
+    <p id="rh_value"></p>
+    <p id="rh_temp"></p>
+    <p id="rh_info"></p>
+    <p id="temp_value"></p>
+</div>
+
+<div id="rightpane">
+    <p id="rpane_rh"></p>
+    <p id="rpane_temp"></p>
+</div>
+<div id="bottom_display"></div>
+
+
+<div id="main"></div>
+
+<script>
+    function getDate(daysAgo) {
+        // Returns formatted date for "daysAgo"
+
+        //If no arguments are passed then return today
+        if ( daysAgo == null ) { daysAgo = 0; }
+
+        let d = new Date();
+        d.setDate(d.getDate() -daysAgo);
+
+        let year = String(d.getFullYear());
+        let month = String(d.getMonth() + 1);
+        let day = String(d.getDate());
+        if ( month.length == 1 ) { month = '0' + month; }
+        if ( day.length == 1) { day = '0' + day; }
+        let date = year + month + day;
+        return date;
+    }
+
+    settings = {
+        sensors     : [],
+        setCookie   : function(cname, cvalue) {
+            let exdays = 30;
+            var d = new Date();
+            d.setTime(d.getTime() + (exdays*24*60*60*1000));
+            var expires = "expires="+ d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        },
+        getCookie   : function(cname) {
+            var name = cname + "=";
+            var ca = document.cookie.split(';');
+            for(var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            // No cookie found
+            return '';
+        },
+        left        : function() {
+            return this.getCookie('left');
+        },
+        right       : function() {
+            return this.getCookie('right');
+        },
+        setLeft  : function(cvalue) {
+            this.setCookie('left', cvalue);
+        },
+        setRight  : function(cvalue) {
+            this.setCookie('right', cvalue);
+        }
+    }
+
+    function find(id) {
+        // Convert sensor id to index number
+        for (var i = 0; i < sens.length; i++) {
+            if ( sens[i].id == id ) { return i; }
+        }
+    }
+
+    function receivedData(serverReply) {
+        if (serverReply.readyState == 4 && serverReply.status == 200) {
+            let recData = serverReply.responseText.split(";");
+
+            // Remove last element in list as it is empty and created by string.split
+            recData.pop(-1);
+            createSensors(recData);
+            updateScreen();
+        } else {
+            console.debug('state: ' + serverReply.readyState + ' status: ' + serverReply.status);
+        }
+    }
+
+    function createSensors(recData) {
+        console.debug('number of rows received: ' + recData.length);
+
+        // Find all sensors
+        let sensors = [];
+        for (let i = 0; i < recData.length; i++) {
+            let foundId = recData[i].split(",")[2];
+            if (!sensors.includes(foundId)) {
+                sensors.push(foundId);
+            }
+        }
+
+        console.debug('found ' + sensors.length + ' sensors: ')
+        for (let i = 0; i < sensors.length; i++) {
+            console.debug(sensors[i]);
+        }
+
+        // Create one object for each sensor id
+        for (let s = 0; s < sensors.length; s++) {
+            sens[s] = new Sensor();
+            sens[s].setData(recData, sensors[s]);
+        }
+
+        /*
+        let testString = '';
+        for (let i = 0; i < recData.length; i++) {
+            testString += i + ':  ' + recData[i] + '\n';
+        }
+        console.debug(testString);
+        */
+
+        // If no sensors are stored in cookies since before, lets set the first ones found..
+        // Better to do it here as we have the sensors array..
+        if ( settings.left() == '' ) {
+            console.debug('no settings for left, setting ' + sensors[0]);
+            settings.setLeft(sensors[0]);
+        }
+        if ( settings.right() == '' ) {
+            console.debug('no settings for right, setting ' + sensors[1]);
+            settings.setRight(sensors[1]);
+        }
+    }
+
+    function sendRequest(fromDay, toDay) {
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://192.168.0.2/tellstick/get.php");
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.addEventListener('readystatechange', function () { receivedData(xhr) }, false);
+        xhr.send('fDate=' + fromDay + '&tDate=' + toDay);
+    }
+
+    function updateScreen() {
+        // Setting correct sensors
+
+        // Get settings (cookie)
+        let rhSensor = find(settings.left());
+        let rightpanesensor = find(settings.right());
+
+        // Left pane
+        let last = sens[rhSensor].date.length - 1;
+        document.getElementById('rh_value').innerText = sens[rhSensor].rh[last] + '%';
+        document.getElementById('rh_temp').innerText = sens[rhSensor].temp[last] + '°';
+        document.getElementById('rh_info').innerText = sens[rhSensor].id + ':  ' +
+                            sens[rhSensor].date[last] + ' ' + sens[rhSensor].time[last];
+        // Right pane
+        last = sens[rightpanesensor].date.length -1;
+        document.getElementById('rpane_rh').innerText = sens[rightpanesensor].rh[last] + '%';
+        document.getElementById('rpane_temp').innerText = sens[rightpanesensor].temp[last] + '°';
+    }
+
+
+    // One object for each sensor / device
+    function Sensor() {
+        this.debug = false;
+        this.setData = function(data, sensorId) {
+            // Extracts data for current sensor id
+            console.debug('method sensor.setData invoked.. ID:  ' + sensorId);
+
+            this.id     = sensorId;
+            this.date   = [];
+            this.time   = [];
+            this.temp   = [];
+            this.rh     = [];
+
+            for (let i = 0; i < data.length; i++) {
+                // Loop thru all readings and store data only for current sensor
+                if (data[i].split(",")[2] == this.id) {
+                    //console.debug('storing ' + i + ' into ' + this.id)
+                    this.date.push(data[i].split(",")[0]);
+                    this.time.push(data[i].split(",")[1]);
+                    this.temp.push(data[i].split(",")[3]);
+                    this.rh.push(data[i].split(",")[4]);
+                }
+
+                if (this.debug) {
+                    console.debug('date: ' + data[i].split(",")[0]);
+                    console.debug('time: ' + data[i].split(",")[1]);
+                    console.debug('sensor: ' + data[i].split(",")[2]);
+                    console.debug('temp: ' + data[i].split(",")[3]);
+                    console.debug('rh: ' + data[i].split(",")[4]);
+                }
+
+            }
+            console.debug('Sensor id: ' + this.id + ' has ' + this.date.length + ' readings..');
+
+        }
+
+        this.printData = function() {
+            console.debug('printing ' + this.date.length + ' readings for sensor ' + this.id);
+            for (let i = 0; i < this.date.length; i++) {
+                console.debug(i + '  ' + this.date[i] + '  ' + this.time[i] + '  ' + this.temp[i] + '  ' + this.rh[i]);
+            }
+        }
+    }
+
+    function closeiframe() {
+        let closeframe = document.getElementsByTagName('IFRAME')[0];
+        closeframe.parentNode.removeChild(closeframe);
+        updateScreen();
+        document.getElementById('rh_display').style.display = '';
+
+    }
+
+    function settingsMenu() {
+        console.debug('settingsmenu called');
+        // creating an Iframe!
+        document.getElementById('rh_display').style.display = 'none';
+        //document.getElementById('settingsiframe').style.display = '';
+        var settingsFrame = document.createElement('IFRAME');
+        //settingsFrame.hidden = false;
+        settingsFrame.setAttribute('src', 'settings.html');
+        document.body.appendChild(settingsFrame);
+    }
+
+    // Declare object "sens" here to give it global scope!
+    sens = [];
+    //document.getElementById('testBtn').addEventListener('click', function() { settingsMenu() }, false);
+    document.getElementById('rh_display').addEventListener('click', settingsMenu, false);
+
+    sendRequest(getDate(1), getDate());
+
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+@media screen and (max-width: 1000px) {
+    html  {
+        background: lightgray;
+    }
+    iframe  {
+    //display: none;
+        width: 65vw;
+    }
+    #rh_display  {
+        position: fixed;
+        top: 3px;
+        left: 3px;
+        width: 69vw;
+        height: 50vh;
+    //display: none;
+        background-color: lightgoldenrodyellow;
+        border-radius: 10px;
+        padding-bottom: 0px;
+    }
+    #rightpane  {
+        text-align: center;
+        position: fixed;
+        right: 3px;
+        top: 3px;
+        width: 27vw;
+        height: 50vh;
+        background-color: lightblue;
+        border-radius: 10px;
+    }
+    #bottom_display  {
+        position: fixed;
+        bottom: 3px;
+        left: 3px;
+        right: 3px;
+    //width: 97vw;
+        height: 48vh;
+        background-color: #22dbb7;
+        border-radius: 10px;
+    }
+    #rh_value  {
+        text-align: center;
+        font-weight: bold;
+        margin-top: 10vh;
+        margin-bottom: 0px;
+    //margin: 5px;
+        font-size: 27vw;
+
+    }
+    #rh_temp  {
+        text-align: right;
+        margin: 5px;
+        font-size: 10vw;
+    }
+    #rpane_rh  {
+        font-size: 12vw;
+        margin: 0px;
+    }
+    #rpane_temp  {
+        font-size: 12vw;
+        margin: 0px;
+    }
+
+}
