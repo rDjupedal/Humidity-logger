@@ -1,0 +1,165 @@
+html  {
+    background: lightgray;
+}
+
+/* Buttons (Some are overridden!) */
+button {
+    border-radius: 10px;
+    margin: 20px;
+    background: #1b76c7;
+    color: white;
+    padding: 2rem 4rem;
+    border: 0;
+    font-size: 1.5rem;
+}
+
+#addDiv {
+    margin: 20px;
+
+}
+
+#addBtn {
+    width: 100%;
+    height: 200px;
+    padding: 20px;
+    margin: 0px;
+}
+
+#daysBtn {
+    background: #44FFFF;
+    color: #000000;
+    margin: 6px;
+    padding: 20px 100px;
+}
+
+/* Input in settings-menu */
+input {
+    border-radius: 10px;
+    margin-top: 30px;
+    margin-bottom: -50px;
+    margin-left: 15px;
+    margin-right: 15px;
+    font-size: 30px;
+}
+
+/* Selection in settings-menu */
+select {
+    border-radius: 10px;
+    margin-top: 30px;
+    margin-bottom: -50px;
+    margin-left: 15px;
+    margin-right: 15px;
+    font-size: 30px;
+}
+
+/* Buttons in settings menu */
+.settingButtons {
+    padding: 0rem 0rem;
+    margin-left: 15px;
+    margin-right: 15px;
+    margin-bottom: 30px;
+    margin-top: -50px;
+}
+
+#daysDiv {
+    border-radius: 10px;
+    margin: 20px;
+    background: #1b76c7;
+    color: white;
+    padding: 2rem 4rem;
+    border: 0;
+    font-size: 1.5rem;
+}
+
+#daysSelector {
+    font-size: 40px;
+}
+
+/* Each sensor */
+.sensordisplay {
+    height: 200px;
+    margin: 20px;
+    background-color: #7010d5;
+    border-radius: 10px;
+}
+
+/* Text shown in digits-menu */
+.text {
+    font-size:30px;
+    font-weight: bold;
+    color: #9fdada;
+}
+
+/* The grid used in digits menu */
+.grid {
+    display: grid;
+    grid-template-columns: 50% 1fr;
+    grid-template-rows: 30px 1fr 40px;
+}
+
+/* Temp display in digit-mode */
+#tempdigit {
+    grid-column: 2; grid-row: 2;
+    font-weight: bold;
+    font-size: 100px;
+    text-align: center;
+}
+
+/* RH display in digit-mode */
+#rhdigit {
+    grid-column: 1; grid-row: 2;
+    font-weight: bold;
+    font-size: 100px;
+    text-align: center;
+}
+
+/* Date and time of the last reading in digit-mode */
+#lastupdate {
+    grid-column: 1; grid-row: 3;
+    margin-left: 10px;
+}
+
+/* Label in digit-mode */
+#label {
+    grid-column: 1; grid-row: 1;
+    margin-left: 10px;
+}
+
+/* Preceding reading in digit-mode */
+#preceding {
+    grid-column: 2; grid-row: 3;
+    text-align: center;
+    font-style: italic;
+    margin-right: 10px;
+}
+
+.relative {
+    position: relative;
+}
+
+canvas {
+    border-radius: 10px;
+    position: absolute;
+    bottom: 0px;
+}
+
+#tempRhDiv {
+    //grid-column: 2; grid-row: 1;
+    //margin-top: -20px;
+    position: absolute;
+    top: -20px;
+    //padding: 0px;
+}
+
+#idLabelDiv {
+    position: absolute;
+    top: -10px;
+    right: 30px;
+}
+
+#backBtn {
+    margin-top: 20px;
+    padding: 0px 10px;
+    font-size: 1rem;
+}
+
